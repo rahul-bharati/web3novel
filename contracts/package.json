@@ -1,0 +1,17 @@
+{
+  "name": "contracts",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "asb",
+    "build:debug": "asb --target debug",
+    "test": "asp --nologo"
+  },
+  "devDependencies": {
+    "shelljs": "^0.8.5"
+  },
+  "dependencies": {
+    "near-sdk-as": "^3.2.3"
+  }
+}
