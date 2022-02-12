@@ -7,14 +7,23 @@ import {
   WalletConnection,
 } from "near-api-js";
 import getConfig from "../config";
+import { CONTRACT_NAME } from "./../config";
 
 interface Props {
   children: JSX.Element;
 }
 
-interface IAppContext {}
+interface IAppContext {
+  user: string;
+  signIn: Function;
+  signOut: Function;
+}
 
-export const AppContext = createContext<IAppContext>({});
+export const AppContext = createContext<IAppContext>({
+  user: "",
+  signIn: () => {},
+  signOut: () => {},
+});
 
 export const AppContextProvider = ({ children }: Props) => {
   const [wallet, setWallet] = useState<WalletConnection>();
@@ -44,23 +53,30 @@ export const AppContextProvider = ({ children }: Props) => {
     setWallet(walletConnection);
     setNearConfig(near);
     setNearContract(contract);
-
-    console.log({ walletConnection, near, contract });
   };
 
   useEffect(() => {
-    if (!wallet || !nearConfig || nearContract) {
+    if (!wallet || !nearConfig || !nearContract) {
       initContract();
     }
     if (wallet?.isSignedIn()) {
       setUser(wallet.getAccountId());
     }
+    console.log({ user, isConnected: wallet?.isSignedIn() });
   }, []);
 
   const signIn = () => {
-    wallet?.requestSignIn(nearContract?.contractId, "web3Novel");
-    setUser(wallet?.getAccountId());
+    wallet?.requestSignIn(nearContract?.contractId, CONTRACT_NAME);
   };
 
-  return <AppContext.Provider value={{}}>{children}</AppContext.Provider>;
+  const signOut = () => {
+    wallet?.signOut();
+    window.location.replace(window.location.origin + window.location.pathname);
+  };
+
+  return (
+    <AppContext.Provider value={{ user, signIn, signOut }}>
+      {children}
+    </AppContext.Provider>
+  );
 };
