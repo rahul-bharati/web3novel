@@ -1,4 +1,4 @@
-const CONTRACT_NAME = process.env.CONTRACT_NAME || "web3novel";
+const CONTRACT_NAME = process.env.NEXT_PUBLIC_CONTRACT_NAME || "web3novel";
 
 function getConfig(env: string) {
   switch (env) {

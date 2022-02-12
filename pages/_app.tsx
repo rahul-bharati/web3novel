@@ -1,8 +1,19 @@
 import "../styles/globals.scss";
 import type { AppProps } from "next/app";
+import { AppContextProvider } from "../context/AppContext";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+  return (
+    <AppContextProvider>
+      <>
+        <Navbar />
+        <Component {...pageProps} />
+        <Footer />
+      </>
+    </AppContextProvider>
+  );
 }
 
 export default MyApp;
