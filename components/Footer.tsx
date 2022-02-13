@@ -2,7 +2,7 @@ import type { NextComponentType } from "next";
 
 const Footer: NextComponentType = () => {
   return (
-    <div className="w-full top-0 left-0 bg-gray-900 shadow-md py-8 border-t-2">
+    <div className="w-full top-0 left-0 bg-gray-900 shadow-md py-8 border-t-2 border-gray-700">
       <div className="container mx-auto max-w-[1200px] p-4 flex items-center justify-between">
         <div className="brand">
           <h1 className="text-2xl text-gray-50">Web3Novel</h1>

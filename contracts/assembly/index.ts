@@ -14,16 +14,10 @@
 
 import { Context, logging, storage } from 'near-sdk-as'
 import { User, users } from './models';
-import { context } from 'near-sdk-as';
 
-export function addUser( _name: string, _email: string, _display_picture: string): void {
-  const user = new User(_name, _email, _display_picture);
-  users.set(context.sender, user);
-}
-
-export function getCurrentUser(): User | null {
-  const user = users.get(context.sender);
-  return user;
+export function addUser( _firstname: string, _lastname: string, _email: string, _bio: string): void {
+  const user = new User(_firstname, _lastname, _email, _bio);
+  users.set(Context.sender, user);
 }
 
 export function getUser(id: string): User|null {

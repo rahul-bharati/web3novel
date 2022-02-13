@@ -9,6 +9,7 @@ import {
 import getConfig from "../config";
 import { CONTRACT_NAME } from "./../config";
 import { useRouter } from "next/router";
+import { Interface } from "readline";
 
 declare global {
   interface Window {
@@ -16,27 +17,46 @@ declare global {
   }
 }
 
+interface User {
+  address: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  bio: string;
+}
+
 interface Props {
   children: JSX.Element;
+}
+
+interface Web3NovelContract extends Contract {
+  getUser: Function;
+  addUser: Function;
 }
 
 interface IAppContext {
   user: string;
   signIn: Function;
   signOut: Function;
+  fetchCurrentUser: Function;
+  updateCurrentUser: Function;
 }
 
 export const AppContext = createContext<IAppContext>({
   user: "",
   signIn: () => {},
   signOut: () => {},
+  fetchCurrentUser: () => {},
+  updateCurrentUser: () => {},
 });
 
 export const AppContextProvider = ({ children }: Props) => {
   const router = useRouter();
   const [wallet, setWallet] = useState<WalletConnection>();
   const [nearConfig, setNearConfig] = useState<Near>();
-  const [nearContract, setNearContract] = useState<Contract>();
+  const [nearContract, setNearContract] = useState<
+    Web3NovelContract | Contract
+  >();
 
   const [user, setUser] = useState("");
 
@@ -80,7 +100,13 @@ export const AppContextProvider = ({ children }: Props) => {
   }, [wallet]);
 
   const signIn = () => {
-    wallet?.requestSignIn(nearContract?.contractId, CONTRACT_NAME);
+    wallet?.requestSignIn(
+      {
+        contractId: nearContract?.contractId,
+        methodNames: ["getUser", "addUser"],
+      },
+      CONTRACT_NAME
+    );
   };
 
   const signOut = () => {
@@ -89,8 +115,33 @@ export const AppContextProvider = ({ children }: Props) => {
     router.push("/");
   };
 
+  const fetchCurrentUser = async () => {
+    const contract = nearContract as Web3NovelContract;
+    const nearUser = await contract?.getUser({ id: user });
+    return nearUser;
+  };
+
+  const updateCurrentUser = async ({
+    firstname,
+    lastname,
+    email,
+    bio,
+  }: User) => {
+    const contract = nearContract as Web3NovelContract;
+    await contract?.addUser({
+      _firstname: firstname,
+      _lastname: lastname,
+      _email: email,
+      _bio: bio,
+    });
+    const nearUser = await fetchCurrentUser();
+    return nearUser;
+  };
+
   return (
-    <AppContext.Provider value={{ user, signIn, signOut }}>
+    <AppContext.Provider
+      value={{ user, signIn, signOut, fetchCurrentUser, updateCurrentUser }}
+    >
       {children}
     </AppContext.Provider>
   );

@@ -1,17 +1,19 @@
-import { context, PersistentVector, PersistentMap } from 'near-sdk-as';
+import { Context, PersistentVector, PersistentMap } from 'near-sdk-as';
 
 @nearBindgen
 export class User {
-  name: string;
+  firstname: string;
+  lastname: string;
   address: string;
   email: string;
-  display_picture: string;
+  bio: string;
 
-  constructor( _name: string, _email: string, _display_picture: string) {
-    this.name = _name;
-    this.address = context.sender;
+  constructor( _firstname: string, _lastname: string, _email: string, _bio: string) {
+    this.firstname = _firstname;
+    this.lastname = _lastname;
+    this.address = Context.sender;
     this.email = _email;
-    this.display_picture = _display_picture;
+    this.bio = _bio;
   }
 }
 
