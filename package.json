@@ -10,6 +10,8 @@
     "dev:deploy:contract": "near dev-deploy"
   },
   "dependencies": {
+    "@tiptap/react": "^2.0.0-beta.108",
+    "@tiptap/starter-kit": "^2.0.0-beta.183",
     "lottie-react": "^2.2.1",
     "near-api-js": "^0.44.2",
     "next": "12.0.10",
