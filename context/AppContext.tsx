@@ -8,6 +8,13 @@ import {
 } from "near-api-js";
 import getConfig from "../config";
 import { CONTRACT_NAME } from "./../config";
+import { useRouter } from "next/router";
+
+declare global {
+  interface Window {
+    walletConnection: any;
+  }
+}
 
 interface Props {
   children: JSX.Element;
@@ -26,6 +33,7 @@ export const AppContext = createContext<IAppContext>({
 });
 
 export const AppContextProvider = ({ children }: Props) => {
+  const router = useRouter();
   const [wallet, setWallet] = useState<WalletConnection>();
   const [nearConfig, setNearConfig] = useState<Near>();
   const [nearContract, setNearContract] = useState<Contract>();
@@ -37,11 +45,14 @@ export const AppContextProvider = ({ children }: Props) => {
     const nearConfig = getConfig(process.env.NEXT_PUBLIC_ENV || "testnet");
     const near = await connect({
       keyStore,
+      deps: {
+        keyStore,
+      },
       ...nearConfig,
       headers: { "Content-Type": "application/json" },
     });
     const walletConnection = new WalletConnection(near, "web3novel");
-    const contract = new Contract(
+    const contract = await new Contract(
       walletConnection.account(),
       nearConfig.contractName,
       {
@@ -49,7 +60,6 @@ export const AppContextProvider = ({ children }: Props) => {
         changeMethods: ["addUser"],
       }
     );
-
     setWallet(walletConnection);
     setNearConfig(near);
     setNearContract(contract);
@@ -59,11 +69,15 @@ export const AppContextProvider = ({ children }: Props) => {
     if (!wallet || !nearConfig || !nearContract) {
       initContract();
     }
+  }, []);
+
+  useEffect(() => {
     if (wallet?.isSignedIn()) {
       setUser(wallet.getAccountId());
+    } else {
+      setUser("");
     }
-    console.log({ user, isConnected: wallet?.isSignedIn() });
-  }, []);
+  }, [wallet]);
 
   const signIn = () => {
     wallet?.requestSignIn(nearContract?.contractId, CONTRACT_NAME);
@@ -71,7 +85,8 @@ export const AppContextProvider = ({ children }: Props) => {
 
   const signOut = () => {
     wallet?.signOut();
-    window.location.replace(window.location.origin + window.location.pathname);
+    setUser("");
+    router.push("/");
   };
 
   return (

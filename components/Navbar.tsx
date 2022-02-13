@@ -1,4 +1,5 @@
 import type { NextComponentType } from "next";
+import Link from "next/link";
 import { useContext } from "react";
 import { AppContext } from "./../context/AppContext";
 
@@ -9,7 +10,9 @@ const Navbar: NextComponentType = () => {
     <div className="w-full fixed top-0 left-0 bg-gray-900 z-10 shadow-md">
       <div className="container mx-auto max-w-[1200px] p-4 flex items-center justify-between">
         <div className="brand">
-          <h1 className="text-2xl text-gray-50">Web3Novel</h1>
+          <Link href={"/"} passHref>
+            <h1 className="text-2xl text-gray-50 cursor-pointer">Web3Novel</h1>
+          </Link>
         </div>
         <ul className="list-none text-white flex items-center justify-center">
           <li className="text-xl mx-2">Write</li>
