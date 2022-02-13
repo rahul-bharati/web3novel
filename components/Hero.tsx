@@ -4,7 +4,7 @@ import ReaderData from "../lotties/reader.json";
 
 const Hero: NextComponentType = () => {
   return (
-    <div className="container max-w-[1200px] h-screen mx-auto flex flex-col md:flex-row items-center justify-center px-4 py-10 my-10">
+    <div className="container max-w-[1200px] h-screen mx-auto flex flex-col md:flex-row items-center justify-center px-4 py-10 my-10 -mt-10">
       <div className="w-full">
         <h2 className="text-6xl font-bold text-gray-50 text-center md:text-left">
           Here lives amazing stories...
