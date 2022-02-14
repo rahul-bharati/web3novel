@@ -1,16 +1,45 @@
 import type { NextPage } from "next";
-import { useRef, useState } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+import dynamic from "next/dynamic";
 
-const Tiptap = () => {
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: "<p>Hello World! 🌎️</p>",
-  });
+const QuillNoSSRWrapper = dynamic(import("react-quill"), {
+  ssr: false,
+  loading: () => <p>Loading ...</p>,
+});
 
-  return <EditorContent editor={editor} />;
+const modules = {
+  toolbar: [
+    [{ header: "1" }, { header: "2" }, { font: [] }],
+    [{ size: [] }],
+    ["bold", "italic", "underline", "strike", "blockquote"],
+    [
+      { list: "ordered" },
+      { list: "bullet" },
+      { indent: "-1" },
+      { indent: "+1" },
+    ],
+    ["link", "code"],
+    ["clean"],
+  ],
+  clipboard: {
+    // toggle to add extra line breaks when pasting HTML:
+    matchVisual: false,
+  },
 };
+
+const formats = [
+  "header",
+  "font",
+  "size",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "blockquote",
+  "list",
+  "bullet",
+  "indent",
+  "link",
+];
 
 const Write: NextPage = () => {
   return (
@@ -25,8 +54,13 @@ const Write: NextPage = () => {
           autoFocus
           multiple
         />
-        <div className="w-full mt-5">
-          <Tiptap />
+        <div className="w-full mt-5 text-gray-100">
+          <QuillNoSSRWrapper
+            theme="snow"
+            modules={modules}
+            formats={formats}
+            placeholder="Write your story here..."
+          />
         </div>
       </div>
     </div>
