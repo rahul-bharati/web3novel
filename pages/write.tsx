@@ -1,8 +1,11 @@
 import type { NextPage } from "next";
 import dynamic from "next/dynamic";
+import { useContext } from "react";
+import { AppContext } from "./../context/AppContext";
 
 const QuillNoSSRWrapper = dynamic(import("react-quill"), {
   ssr: false,
+
   loading: () => <p>Loading ...</p>,
 });
 
@@ -42,6 +45,8 @@ const formats = [
 ];
 
 const Write: NextPage = () => {
+  const { storyObj, setStoryObj } = useContext(AppContext);
+
   return (
     <div className="w-full my-10">
       <div className="container max-w-[1200px] mx-auto px-4 h-screen">
@@ -60,6 +65,8 @@ const Write: NextPage = () => {
             modules={modules}
             formats={formats}
             placeholder="Write your story here..."
+            value={storyObj.content}
+            onChange={(e) => setStoryObj({ ...storyObj, content: e })}
           />
         </div>
       </div>

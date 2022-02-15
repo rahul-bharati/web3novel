@@ -5,7 +5,7 @@ import { AppContext } from "./../context/AppContext";
 import { useRouter } from "next/router";
 
 const Navbar: NextComponentType = () => {
-  const { signIn, user, signOut } = useContext(AppContext);
+  const { signIn, user, signOut, createStory } = useContext(AppContext);
 
   const [isWritePage, setIsWritePage] = useState(false);
   const router = useRouter();
@@ -33,7 +33,10 @@ const Navbar: NextComponentType = () => {
                 <Link href="/">Stats</Link>
               </li>
               <li className="text-xl ml-4">
-                <button className="btn px-8 py-2 text-xl text-white bg-blue-600 rounded-full">
+                <button
+                  className="btn px-8 py-2 text-xl text-white bg-blue-600 rounded-full"
+                  onClick={() => createStory()}
+                >
                   Publish
                 </button>
               </li>

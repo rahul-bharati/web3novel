@@ -10,6 +10,7 @@ import getConfig from "../config";
 import { CONTRACT_NAME } from "./../config";
 import { useRouter } from "next/router";
 import { Interface } from "readline";
+import { generateSlug } from "./../utils/slug";
 
 declare global {
   interface Window {
@@ -25,6 +26,11 @@ interface User {
   bio: string;
 }
 
+interface Story {
+  title: string;
+  content: string;
+}
+
 interface Props {
   children: JSX.Element;
 }
@@ -32,14 +38,19 @@ interface Props {
 interface Web3NovelContract extends Contract {
   getUser: Function;
   addUser: Function;
+  addStory: Function;
+  getStories: Function;
 }
 
 interface IAppContext {
   user: string;
+  storyObj: Story;
+  setStoryObj: Function;
   signIn: Function;
   signOut: Function;
   fetchCurrentUser: Function;
   updateCurrentUser: Function;
+  createStory: Function;
 }
 
 export const AppContext = createContext<IAppContext>({
@@ -48,6 +59,9 @@ export const AppContext = createContext<IAppContext>({
   signOut: () => {},
   fetchCurrentUser: () => {},
   updateCurrentUser: () => {},
+  createStory: () => {},
+  storyObj: { title: "", content: "" },
+  setStoryObj: () => {},
 });
 
 export const AppContextProvider = ({ children }: Props) => {
@@ -57,6 +71,7 @@ export const AppContextProvider = ({ children }: Props) => {
   const [nearContract, setNearContract] = useState<
     Web3NovelContract | Contract
   >();
+  const [storyObj, setStoryObj] = useState<Story>({ title: "", content: "" });
 
   const [user, setUser] = useState("");
 
@@ -76,8 +91,8 @@ export const AppContextProvider = ({ children }: Props) => {
       walletConnection.account(),
       nearConfig.contractName,
       {
-        viewMethods: ["getCurrentUser", "getUser"],
-        changeMethods: ["addUser"],
+        viewMethods: ["getUser", "getStories"],
+        changeMethods: ["addUser", "addStory"],
       }
     );
     setWallet(walletConnection);
@@ -138,9 +153,28 @@ export const AppContextProvider = ({ children }: Props) => {
     return nearUser;
   };
 
+  const createStory = async () => {
+    const contract = nearContract as Web3NovelContract;
+    const slug = generateSlug(storyObj.title);
+    await contract?.addStory({
+      _title: storyObj.title,
+      _content: storyObj.content,
+      _slug: slug,
+    });
+  };
+
   return (
     <AppContext.Provider
-      value={{ user, signIn, signOut, fetchCurrentUser, updateCurrentUser }}
+      value={{
+        user,
+        signIn,
+        signOut,
+        fetchCurrentUser,
+        updateCurrentUser,
+        createStory,
+        storyObj,
+        setStoryObj,
+      }}
     >
       {children}
     </AppContext.Provider>

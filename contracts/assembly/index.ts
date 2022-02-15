@@ -13,7 +13,8 @@
  */
 
 import { Context, logging, storage } from 'near-sdk-as'
-import { User, users } from './models';
+import { Story, User, users } from './models';
+import { stories } from './models';
 
 export function addUser( _firstname: string, _lastname: string, _email: string, _bio: string): void {
   const user = new User(_firstname, _lastname, _email, _bio);
@@ -25,23 +26,16 @@ export function getUser(id: string): User|null {
   return user;
 }
 
-
-
-const DEFAULT_MESSAGE = 'Hello'
-
-// Exported functions will be part of the public interface for your smart contract.
-// Feel free to extract behavior to non-exported functions!
-export function getGreeting(accountId: string): string | null {
-  // This uses raw `storage.get`, a low-level way to interact with on-chain
-  // storage for simple contracts.
-  // If you have something more complex, check out persistent collections:
-  // https://docs.near.org/docs/concepts/data-storage#assemblyscript-collection-types
-  return storage.get<string>(accountId, DEFAULT_MESSAGE)
+export function addStory(_title: string, _content: string, _slug: string): void {
+  const story = new Story(_title, _content, _slug);
+  stories.push(story);
 }
 
-export function setGreeting(message: string): void {
-  const accountId = Context.sender
-  // Use logging.log to record logs permanently to the blockchain!
-  logging.log(`Saving greeting "${message}" for account "${accountId}"`)
-  storage.set(accountId, message)
+export function getStories(): Story[] {
+  const story_collection: Story[] = [];
+  const total_stories = stories.length;
+  for(let i=0; i<total_stories; i++){
+    story_collection[i] = stories[i];
+  }
+  return story_collection;
 }
