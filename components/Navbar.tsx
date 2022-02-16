@@ -5,18 +5,29 @@ import { AppContext } from "./../context/AppContext";
 import { useRouter } from "next/router";
 
 const Navbar: NextComponentType = () => {
-  const { signIn, user, signOut, createStory } = useContext(AppContext);
+  const { signIn, user, signOut, createStory, loading, setLoading } =
+    useContext(AppContext);
 
   const [isWritePage, setIsWritePage] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     if (router.pathname == "/write") {
+      if (router.query.transactionHashes) {
+        window.alert("Your story has been published.");
+        router.push("/write");
+      }
       setIsWritePage(true);
     } else {
       setIsWritePage(false);
     }
-  }, [router.pathname]);
+  }, [router.pathname, router]);
+
+  const handlePublish = async () => {
+    setLoading(true);
+    await createStory();
+    setLoading(false);
+  };
 
   return (
     <div className="w-full fixed top-0 left-0 bg-gray-900 z-10 shadow-md">
@@ -35,7 +46,7 @@ const Navbar: NextComponentType = () => {
               <li className="text-xl ml-4">
                 <button
                   className="btn px-8 py-2 text-xl text-white bg-blue-600 rounded-full"
-                  onClick={() => createStory()}
+                  onClick={() => handlePublish()}
                 >
                   Publish
                 </button>

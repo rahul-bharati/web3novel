@@ -11,6 +11,9 @@ import { CONTRACT_NAME } from "./../config";
 import { useRouter } from "next/router";
 import { Interface } from "readline";
 import { generateSlug } from "./../utils/slug";
+import { Web3Storage } from "web3.storage";
+import { Web3StorageToken } from "../utils/tokens";
+import { jsonFile, makeGatewayURL } from "../utils/storage";
 
 declare global {
   interface Window {
@@ -51,6 +54,10 @@ interface IAppContext {
   fetchCurrentUser: Function;
   updateCurrentUser: Function;
   createStory: Function;
+  storageClient: Web3Storage | null;
+  isStorageClientValid: Function;
+  loading: boolean;
+  setLoading: Function;
 }
 
 export const AppContext = createContext<IAppContext>({
@@ -62,6 +69,10 @@ export const AppContext = createContext<IAppContext>({
   createStory: () => {},
   storyObj: { title: "", content: "" },
   setStoryObj: () => {},
+  storageClient: null,
+  isStorageClientValid: () => {},
+  loading: false,
+  setLoading: () => {},
 });
 
 export const AppContextProvider = ({ children }: Props) => {
@@ -74,6 +85,25 @@ export const AppContextProvider = ({ children }: Props) => {
   const [storyObj, setStoryObj] = useState<Story>({ title: "", content: "" });
 
   const [user, setUser] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const storageClient = new Web3Storage({ token: Web3StorageToken });
+
+  const isStorageClientValid = async () => {
+    try {
+      for await (const _ of storageClient.list({ maxResults: 1 })) {
+        // any non-error response means the token is legit
+        break;
+      }
+      return true;
+    } catch (error: any) {
+      // only return false for auth-related errors
+      if (error.message.includes("401") || error.message.includes("403")) {
+        console.log("invalid token", error.message);
+        return false;
+      }
+    }
+  };
 
   const initContract = async () => {
     const keyStore = new keyStores.BrowserLocalStorageKeyStore();
@@ -154,13 +184,27 @@ export const AppContextProvider = ({ children }: Props) => {
   };
 
   const createStory = async () => {
-    const contract = nearContract as Web3NovelContract;
-    const slug = generateSlug(storyObj.title);
-    await contract?.addStory({
-      _title: storyObj.title,
-      _content: storyObj.content,
-      _slug: slug,
-    });
+    try {
+      const contract = nearContract as Web3NovelContract;
+      const slug = generateSlug(storyObj.title) + "-" + new Date().getTime();
+      const metadata = jsonFile("metadata.json", { ...storyObj, owner: user });
+      console.log(metadata);
+      const storyCid = await storageClient.put([metadata], {
+        name: "web3Novel_" + slug,
+        onStoredChunk: (size) => {
+          console.log(`Uploading... ${(size * 100).toFixed(2)} uploaded`);
+        },
+      });
+      const metadataGatewayURL = makeGatewayURL(storyCid, "metadata.json");
+      await contract?.addStory({
+        _title: storyObj.title,
+        _content: metadataGatewayURL,
+        _slug: slug,
+      });
+    } catch (error) {
+      window.alert("Unknown error ocurred");
+      console.log(error);
+    }
   };
 
   return (
@@ -174,6 +218,10 @@ export const AppContextProvider = ({ children }: Props) => {
         createStory,
         storyObj,
         setStoryObj,
+        isStorageClientValid,
+        storageClient,
+        loading,
+        setLoading,
       }}
     >
       {children}
