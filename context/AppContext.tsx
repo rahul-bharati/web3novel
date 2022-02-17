@@ -43,6 +43,7 @@ interface Web3NovelContract extends Contract {
   addUser: Function;
   addStory: Function;
   getStories: Function;
+  getStory: Function;
 }
 
 interface IAppContext {
@@ -59,6 +60,7 @@ interface IAppContext {
   loading: boolean;
   setLoading: Function;
   fetchStoriesFromNear: Function;
+  fetchStoryFromNear: Function;
 }
 
 export const AppContext = createContext<IAppContext>({
@@ -75,6 +77,7 @@ export const AppContext = createContext<IAppContext>({
   loading: false,
   setLoading: () => {},
   fetchStoriesFromNear: () => {},
+  fetchStoryFromNear: () => {},
 });
 
 export const AppContextProvider = ({ children }: Props) => {
@@ -123,7 +126,7 @@ export const AppContextProvider = ({ children }: Props) => {
       walletConnection.account(),
       nearConfig.contractName,
       {
-        viewMethods: ["getUser", "getStories"],
+        viewMethods: ["getUser", "getStories", "getStory"],
         changeMethods: ["addUser", "addStory"],
       }
     );
@@ -215,6 +218,12 @@ export const AppContextProvider = ({ children }: Props) => {
     return stories;
   };
 
+  const fetchStoryFromNear = async (slug: string) => {
+    const contract = nearContract as Web3NovelContract;
+    const story = await contract?.getStory({ slug: slug });
+    return story;
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -231,6 +240,7 @@ export const AppContextProvider = ({ children }: Props) => {
         loading,
         setLoading,
         fetchStoriesFromNear,
+        fetchStoryFromNear,
       }}
     >
       {children}
