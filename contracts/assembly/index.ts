@@ -39,3 +39,13 @@ export function getStories(): Story[] {
   }
   return story_collection;
 }
+
+export function getStory(slug: string):Story|null {
+  const total_stories = stories.length;
+  for(let i=0; i<total_stories; i++) {
+    if(stories[i].slug == slug) {
+      return stories[i];
+    }
+  }
+  return null;
+}
