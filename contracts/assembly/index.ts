@@ -49,3 +49,14 @@ export function getStory(slug: string):Story|null {
   }
   return null;
 }
+
+export function getMyStories(user: string): Story[] {
+  const story_collection: Story[] = [];
+  const total_stories = stories.length;
+  for(let i=0; i<total_stories; i++){
+    if(stories[i].address == user) {
+      story_collection[i] = stories[i];
+    }
+  }
+  return story_collection;
+}

@@ -3,10 +3,10 @@ import dynamic from "next/dynamic";
 import { useContext } from "react";
 import Loading from "../components/Loading";
 import { AppContext } from "./../context/AppContext";
+import NotLoggedIn from "./../components/NotLoggedIn";
 
 const QuillNoSSRWrapper = dynamic(import("react-quill"), {
   ssr: false,
-
   loading: () => <p>Loading ...</p>,
 });
 
@@ -46,9 +46,9 @@ const formats = [
 ];
 
 const Write: NextPage = () => {
-  const { storyObj, setStoryObj, loading } = useContext(AppContext);
+  const { user, storyObj, setStoryObj, loading } = useContext(AppContext);
 
-  return (
+  return user ? (
     <>
       {loading && <Loading />}
       <div className="w-full my-10">
@@ -79,6 +79,8 @@ const Write: NextPage = () => {
         </div>
       </div>
     </>
+  ) : (
+    <NotLoggedIn />
   );
 };
 

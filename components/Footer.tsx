@@ -1,4 +1,5 @@
 import type { NextComponentType } from "next";
+import Link from "next/link";
 
 const Footer: NextComponentType = () => {
   return (
@@ -11,8 +12,12 @@ const Footer: NextComponentType = () => {
           </p>
         </div>
         <ul className="list-none text-white flex items-center justify-center">
-          <li className="text-xl mx-2">Write</li>
-          <li className="text-xl mx-2">Stories</li>
+          <li className="text-xl mx-2 cursor-pointer">
+            <Link href="/write">Write</Link>
+          </li>
+          <li className="text-xl mx-2 cursor-pointer">
+            <Link href="/stories">Stories</Link>
+          </li>
         </ul>
       </div>
     </div>

@@ -40,14 +40,30 @@ const Navbar: NextComponentType = () => {
         <ul className="list-none text-white flex items-center justify-center">
           {isWritePage ? (
             <>
-              <li className="text-xl ml-4">
-                <button
-                  className="btn px-8 py-2 text-xl text-white bg-blue-600 rounded-full"
-                  onClick={() => handlePublish()}
-                >
-                  Publish
-                </button>
-              </li>
+              {!user ? (
+                <li className="text-xl ml-4">
+                  <button
+                    className="btn px-8 py-2 text-xl text-white bg-blue-600 rounded-full"
+                    onClick={() => signIn()}
+                  >
+                    Sign in
+                  </button>
+                </li>
+              ) : (
+                <>
+                  <li className="text-xl mx-2 cursor-pointer">
+                    <Link href="/my-stories">My Stories</Link>
+                  </li>
+                  <li className="text-xl ml-4">
+                    <button
+                      className="btn px-8 py-2 text-xl text-white bg-blue-600 rounded-full"
+                      onClick={() => handlePublish()}
+                    >
+                      Publish
+                    </button>
+                  </li>
+                </>
+              )}
             </>
           ) : (
             <>

@@ -1,27 +1,20 @@
 import axios from "axios";
 import type { NextPage } from "next";
-import { useEffect, useState } from "react";
-import { useContext } from "react";
-import { AppContext } from "./../../context/AppContext";
-import ReactHtmlParser from "react-html-parser";
 import Link from "next/link";
-import Loading from "../../components/Loading";
+import { useContext, useEffect, useState } from "react";
+import { AppContext } from "./../context/AppContext";
+import { Story } from "./stories";
+import ReactHtmlParser from "react-html-parser";
+import Loading from "../components/Loading";
+import NotLoggedIn from "../components/NotLoggedIn";
 
-export interface Story {
-  title: string;
-  content: string;
-  added_on: string;
-  slug: string;
-  writtenBy: string;
-}
-
-const Stories: NextPage = () => {
-  const { fetchStoriesFromNear, loading, setLoading } = useContext(AppContext);
+const MyStories: NextPage = () => {
+  const { fetchMyStories, loading, user, setLoading } = useContext(AppContext);
   const [stories, setStories] = useState<Story[]>([]);
 
   const fetchStories = async () => {
     setLoading(true);
-    const nearStories = await fetchStoriesFromNear();
+    const nearStories = await fetchMyStories();
 
     if (nearStories) {
       const items = await Promise.all(
@@ -55,12 +48,14 @@ const Stories: NextPage = () => {
     fetchStories();
   }, []);
 
-  return (
+  return !user ? (
+    <NotLoggedIn />
+  ) : (
     <div className="w-full my-10 min-h-screen">
       {loading && <Loading />}
       <div className="max-w-[1200px] mx-auto">
         <h2 className="text-white text-4xl text-center mb-10 font-bold tracking-wide">
-          Explore amazing stories
+          Published stories
         </h2>
         <div className="w-full max-w-[650px] mx-auto">
           {stories.length > 0 ? (
@@ -102,4 +97,4 @@ const Stories: NextPage = () => {
   );
 };
 
-export default Stories;
+export default MyStories;
