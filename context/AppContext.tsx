@@ -58,6 +58,7 @@ interface IAppContext {
   isStorageClientValid: Function;
   loading: boolean;
   setLoading: Function;
+  fetchStoriesFromNear: Function;
 }
 
 export const AppContext = createContext<IAppContext>({
@@ -73,6 +74,7 @@ export const AppContext = createContext<IAppContext>({
   isStorageClientValid: () => {},
   loading: false,
   setLoading: () => {},
+  fetchStoriesFromNear: () => {},
 });
 
 export const AppContextProvider = ({ children }: Props) => {
@@ -207,6 +209,12 @@ export const AppContextProvider = ({ children }: Props) => {
     }
   };
 
+  const fetchStoriesFromNear = async () => {
+    const contract = nearContract as Web3NovelContract;
+    const stories = await contract?.getStories();
+    return stories;
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -222,6 +230,7 @@ export const AppContextProvider = ({ children }: Props) => {
         storageClient,
         loading,
         setLoading,
+        fetchStoriesFromNear,
       }}
     >
       {children}
